@@ -11,6 +11,7 @@ describe "Features" do
   describe "visiting root" do
     before :each do
       page.set_rack_session(:service => {"access_token" => 1})
+      page.set_rack_session(token: "1")
     end
 
     it "lists repos" do
@@ -24,16 +25,18 @@ describe "Features" do
   describe "new repo form" do
     before :each do
       page.set_rack_session(:service => {"access_token" => 1})
+      page.set_rack_session(token: "1")
     end
 
     it "creates a new repo", :type => :request do
-      visit '/'
+      stubbed = stub_request(:post, "https://api.github.com/user/repos").
+        with(body: {"{\"name\":\"a-new-repo\"}"=>nil},
+        :headers => {'Authorization' => "token 1"})
+      visit root_path
       fill_in 'new-repo', with: 'a-new-repo'
       click_button 'Create'
 
-      expect(WebMock).to have_requested(:post, "https://api.github.com/user/repos").
-        with(:body => {name: "a-new-repo"}.to_json,
-        :headers => {'Authorization' => "token 1"})
+      expect(stubbed).to have_been_requested
     end
   end
 end
