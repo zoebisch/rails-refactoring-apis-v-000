@@ -66,12 +66,13 @@ describe 'GithubService' do
 
   describe '#create_repo' do
     it "sends the correct POST request" do
+      stubbed = stub_request(:post, "https://api.github.com/user/repos").
+        with(body: {"{\"name\":\"a-new-repo\"}"=>nil}, headers: {'Authorization'=>'token 1'})
+
       service = GithubService.new({"access_token" => "1"})
       service.create_repo("a-new-repo")
 
-      expect(WebMock).to have_requested(:post, "https://api.github.com/user/repos").
-        with(:body => {"{\"name\":\"a-new-repo\"}"=>true},
-        :headers => {'Authorization'=>'token 1'})
+      expect(stubbed).to have_been_requested
     end
   end
 end
